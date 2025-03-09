@@ -87,3 +87,64 @@ resolveBtn.addEventListener('click', (event) => {
     // Remove the ticket using removeChild from the container
     ticketContainer.removeChild(ticketCard);
 });
+
+//Task 5: Additional Challenge – Inline Editing of Support Tickets
+ticketCard.addEventListener('dblclick', () => {
+    // Prevent multiple edit inputs from appearing
+    if (ticketCard.querySelector('.save-btn')) return;
+    
+    // Store original values from the static elements
+    const originalName = custName.textContent;
+    const originalIssue = issueDesc.textContent;
+    const originalPriority = priorityLabel.textContent.replace('Priority: ', '');
+    
+    // Clear the current ticket content for editing
+    ticketCard.innerHTML = '';
+    
+    // Create input fields pre-populated with existing values
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.value = originalName;
+    
+    const issueInput = document.createElement('input');
+    issueInput.type = 'text';
+    issueInput.value = originalIssue;
+    
+    const priorityInput = document.createElement('input');
+    priorityInput.type = 'text';
+    priorityInput.value = originalPriority;
+    
+    // Create a save button that updates the ticket with new values
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'save-btn';
+    saveBtn.textContent = 'Save';
+    
+    // Append input fields and buttons to the ticket card, using <br> for spacing
+    ticketCard.append(
+        nameInput, document.createElement('br'),
+        issueInput, document.createElement('br'),
+        priorityInput, document.createElement('br'),
+        saveBtn, document.createElement('br'),
+        resolveBtn
+    );
+    
+    // Update the ticket with the edited details when the save button is clicked
+    saveBtn.addEventListener('click', () => {
+        // Update the static elements with new values
+        custName.textContent = nameInput.value;
+        issueDesc.textContent = issueInput.value;
+        priorityLabel.textContent = `Priority: ${priorityInput.value}`;
+        
+        // Restore the ticket layout after editing
+        ticketCard.innerHTML = '';
+        ticketCard.append(custName, issueDesc, priorityLabel, resolveBtn);
+        
+        // Reapply styles in case the priority was changed
+        styleSingleCard(ticketCard);
+    });
+});
+    
+// Finally, add the completed ticket to the ticket container and apply initial styling
+divTicketContainer.appendChild(ticketCard);
+styleSingleCard(ticketCard);
+return ticketCard;
