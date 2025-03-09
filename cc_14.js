@@ -66,3 +66,24 @@ function styleSingleCard(ticket) {
         ticket.classList.add('other-priority');
     }
 }
+
+    //Task 4 - Support Ticket Resolution with Event Bubbling
+// Assume ticketContainer is defined globally or retrieved as needed
+const ticketContainer = document.getElementById('ticketContainer');
+
+// Attach event listener to the container to log a message when any ticket is clicked
+ticketContainer.addEventListener('click', (event) => {
+    // Use event delegation: check if a ticket card was clicked
+    const ticketCardClicked = event.target.closest('.ticket-card');
+    if (ticketCardClicked) {
+        const custName = ticketCardClicked.querySelector('.ticket-header');
+        console.log('Clicked On Support Ticket:', custName ? custName.textContent : 'Unknown');
+    }
+});
+
+resolveBtn.addEventListener('click', (event) => {
+    // Prevent the event from bubbling up to the ticketContainer
+    event.stopPropagation();
+    // Remove the ticket using removeChild from the container
+    ticketContainer.removeChild(ticketCard);
+});
