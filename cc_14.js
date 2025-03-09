@@ -44,3 +44,25 @@ function createSupportTicket(customer, issue, priority) {
     // Append the ticket card to the container
     ticketContainer.appendChild(ticketCard);
 }
+
+//Task 3: Converting NodeLists to Arrays for Bulk Updates
+function highlightHighPriorityTickets() {
+    // Select all support ticket cards on the page and update each ticket's styling
+    document.querySelectorAll('.ticket-card').forEach(styleSingleCard);
+}
+
+// Applies different styles based on the ticket's priority level
+function styleSingleCard(ticket) {
+    // Retrieve the priority text from the ticket
+    const priorityLabel = ticket.querySelector('.priority-label');
+    const priorityValue = priorityLabel.textContent.replace('Priority: ', '').trim().toLowerCase();
+
+    // Update styling based on the priority value
+    if (priorityValue === 'high') {
+        ticket.classList.remove('other-priority');
+        ticket.classList.add('high-priority');
+    } else {
+        ticket.classList.remove('high-priority');
+        ticket.classList.add('other-priority');
+    }
+}
