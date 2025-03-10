@@ -1,4 +1,4 @@
-//Task 2: Adding Support Tickets Dynamically
+// Task 2: Adding Support Tickets Dynamically
 function createSupportTicket(customer, issue, priority) {
     // Get the container where tickets will be added
     const ticketContainer = document.getElementById('ticketContainer');
@@ -32,32 +32,89 @@ function createSupportTicket(customer, issue, priority) {
         ticketCard.classList.add('other-priority');
     }
 
-    // Create the Resolve button and add a click event to remove the ticket
+    // Create the Resolve button and attach its event listener
     const resolveBtn = document.createElement('button');
     resolveBtn.className = 'resolve-btn';
     resolveBtn.textContent = 'Resolve';
-    resolveBtn.addEventListener('click', () => {
+    resolveBtn.addEventListener('click', (event) => {
+        event.stopPropagation(); // Prevent the click from bubbling up
         ticketContainer.removeChild(ticketCard);
     });
     ticketCard.appendChild(resolveBtn);
 
-    // Append the ticket card to the container
+    // Task 5: Inline Editing for Support Tickets
+    ticketCard.addEventListener('dblclick', () => {
+        // Prevent multiple edit inputs from appearing
+        if (ticketCard.querySelector('.save-btn')) return;
+        
+        // Store original values from the static elements
+        const originalName = custName.textContent;
+        const originalIssue = issueDesc.textContent;
+        const originalPriority = priorityLabel.textContent.replace('Priority: ', '');
+        
+        // Clear the current ticket content for editing
+        ticketCard.innerHTML = '';
+        
+        // Create input fields pre-populated with existing values
+        const nameInput = document.createElement('input');
+        nameInput.type = 'text';
+        nameInput.value = originalName;
+        
+        const issueInput = document.createElement('input');
+        issueInput.type = 'text';
+        issueInput.value = originalIssue;
+        
+        const priorityInput = document.createElement('input');
+        priorityInput.type = 'text';
+        priorityInput.value = originalPriority;
+        
+        // Create a save button that updates the ticket with new values
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'save-btn';
+        saveBtn.textContent = 'Save';
+        
+        // Append input fields and buttons to the ticket card (using <br> for spacing)
+        ticketCard.append(
+            nameInput, document.createElement('br'),
+            issueInput, document.createElement('br'),
+            priorityInput, document.createElement('br'),
+            saveBtn, document.createElement('br'),
+            resolveBtn
+        );
+        
+        // When the save button is clicked, update the ticket
+        saveBtn.addEventListener('click', () => {
+            // Update the static elements with the new values
+            custName.textContent = nameInput.value;
+            issueDesc.textContent = issueInput.value;
+            priorityLabel.textContent = `Priority: ${priorityInput.value}`;
+            
+            // Restore the ticket layout after editing
+            ticketCard.innerHTML = '';
+            ticketCard.append(custName, issueDesc, priorityLabel, resolveBtn);
+            
+            // Reapply styles in case the priority was changed
+            styleSingleCard(ticketCard);
+        });
+    });
+    
+    // Append the ticket card to the container and apply initial styling
     ticketContainer.appendChild(ticketCard);
+    styleSingleCard(ticketCard);
+    
+    return ticketCard;
 }
 
-//Task 3: Converting NodeLists to Arrays for Bulk Updates
+// Task 3: Converting NodeLists to Arrays for Bulk Updates
 function highlightHighPriorityTickets() {
-    // Select all support ticket cards on the page and update each ticket's styling
     document.querySelectorAll('.ticket-card').forEach(styleSingleCard);
 }
 
 // Applies different styles based on the ticket's priority level
 function styleSingleCard(ticket) {
-    // Retrieve the priority text from the ticket
     const priorityLabel = ticket.querySelector('.priority-label');
+    if (!priorityLabel) return; // In case the element is missing
     const priorityValue = priorityLabel.textContent.replace('Priority: ', '').trim().toLowerCase();
-
-    // Update styling based on the priority value
     if (priorityValue === 'high') {
         ticket.classList.remove('other-priority');
         ticket.classList.add('high-priority');
@@ -67,84 +124,26 @@ function styleSingleCard(ticket) {
     }
 }
 
-    //Task 4 - Support Ticket Resolution with Event Bubbling
-// Assume ticketContainer is defined globally or retrieved as needed
+// Task 4: Support Ticket Resolution with Event Bubbling
+// Attach an event listener to the ticket container to log a message when any ticket is clicked.
 const ticketContainer = document.getElementById('ticketContainer');
-
-// Attach event listener to the container to log a message when any ticket is clicked
 ticketContainer.addEventListener('click', (event) => {
-    // Use event delegation: check if a ticket card was clicked
     const ticketCardClicked = event.target.closest('.ticket-card');
     if (ticketCardClicked) {
-        const custName = ticketCardClicked.querySelector('.ticket-header');
-        console.log('Clicked On Support Ticket:', custName ? custName.textContent : 'Unknown');
+        const ticketHeader = ticketCardClicked.querySelector('.ticket-header');
+        console.log('Clicked On Support Ticket:', ticketHeader ? ticketHeader.textContent : 'Unknown');
     }
 });
 
-resolveBtn.addEventListener('click', (event) => {
-    // Prevent the event from bubbling up to the ticketContainer
-    event.stopPropagation();
-    // Remove the ticket using removeChild from the container
-    ticketContainer.removeChild(ticketCard);
+// On page load, create default tickets with new names and highlight high priority tickets
+document.addEventListener('DOMContentLoaded', () => {
+    createSupportTicket('Jon Jones', 'Cannot access account', 'High');
+    createSupportTicket('Connor McGregor', 'Billing issue', 'Medium');
+    createSupportTicket('Michael Phelps', 'Login error', 'Low');
+    highlightHighPriorityTickets();
 });
 
-//Task 5: Additional Challenge – Inline Editing of Support Tickets
-ticketCard.addEventListener('dblclick', () => {
-    // Prevent multiple edit inputs from appearing
-    if (ticketCard.querySelector('.save-btn')) return;
-    
-    // Store original values from the static elements
-    const originalName = custName.textContent;
-    const originalIssue = issueDesc.textContent;
-    const originalPriority = priorityLabel.textContent.replace('Priority: ', '');
-    
-    // Clear the current ticket content for editing
-    ticketCard.innerHTML = '';
-    
-    // Create input fields pre-populated with existing values
-    const nameInput = document.createElement('input');
-    nameInput.type = 'text';
-    nameInput.value = originalName;
-    
-    const issueInput = document.createElement('input');
-    issueInput.type = 'text';
-    issueInput.value = originalIssue;
-    
-    const priorityInput = document.createElement('input');
-    priorityInput.type = 'text';
-    priorityInput.value = originalPriority;
-    
-    // Create a save button that updates the ticket with new values
-    const saveBtn = document.createElement('button');
-    saveBtn.className = 'save-btn';
-    saveBtn.textContent = 'Save';
-    
-    // Append input fields and buttons to the ticket card, using <br> for spacing
-    ticketCard.append(
-        nameInput, document.createElement('br'),
-        issueInput, document.createElement('br'),
-        priorityInput, document.createElement('br'),
-        saveBtn, document.createElement('br'),
-        resolveBtn
-    );
-    
-    // Update the ticket with the edited details when the save button is clicked
-    saveBtn.addEventListener('click', () => {
-        // Update the static elements with new values
-        custName.textContent = nameInput.value;
-        issueDesc.textContent = issueInput.value;
-        priorityLabel.textContent = `Priority: ${priorityInput.value}`;
-        
-        // Restore the ticket layout after editing
-        ticketCard.innerHTML = '';
-        ticketCard.append(custName, issueDesc, priorityLabel, resolveBtn);
-        
-        // Reapply styles in case the priority was changed
-        styleSingleCard(ticketCard);
-    });
+// "Add Ticket" button event listener for creating new tickets
+document.getElementById('addTicketBtn').addEventListener('click', () => {
+    createSupportTicket('Ronda Rousey', 'Software bug report', 'High');
 });
-    
-// Finally, add the completed ticket to the ticket container and apply initial styling
-divTicketContainer.appendChild(ticketCard);
-styleSingleCard(ticketCard);
-return ticketCard;
